@@ -1,4 +1,5 @@
 using ApplicationCore.ServiceInterfaces;
+using Infrastructure.Data;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using ApplicationCore.RepositoryInterfaces;
+using Infrastructure.Repositories;
 
 namespace MovieShopMVC
 {
@@ -26,7 +30,12 @@ namespace MovieShopMVC
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddScoped<IMovieService, MovieServiceTest>();
+            services.AddScoped<IMovieService, MovieService>();
+            services.AddScoped<IMovieRepository, MovieRepository>();
+            services.AddDbContext<MovieShopDbContext>
+                (
+                options => options.UseSqlServer(Configuration.GetConnectionString("MovieShopDbConnection"))
+                );
 
         }
 
