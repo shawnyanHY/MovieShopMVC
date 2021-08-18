@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ApplicationCore.ServiceInterfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +10,29 @@ using System.Threading.Tasks;
 
 namespace MovieShopMVC.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
-        // GET: /<controller>/
-        public IActionResult Index()
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IUserService _userService;
+
+        public UserController(ICurrentUserService currentUserService, IUserService userService)
         {
-            return View();
+            _currentUserService = currentUserService;
+            _userService = userService;
+        }
+
+        public async Task<IActionResult> GetAllPurchases()
+        {
+            var userId = _currentUserService.UserId;
+            var movieCards = await _userService.GetPurchaseMovies(userId);
+            return View(movieCards);
+        }
+        public async Task<IActionResult> GetFavorites()
+        {
+            var userId = _currentUserService.UserId;
+            var movieCards = await _userService.GetFavoriteMovies(userId);
+            return View(movieCards);
         }
     }
 }
